@@ -9,7 +9,6 @@
   <body>
     <script>
       var driver = de.bennyn.storage.indexeddb.Driver;
-      var databaseName = 'bennys-db';
       var configuration = {};
 
       /***
@@ -18,7 +17,7 @@
        * @returns {undefined}
        */
       var onSuccess = function (driver) {
-        driver.delete(databaseName);
+        driver.deleteDatabase();
       };
 
       var onError = function (error) {

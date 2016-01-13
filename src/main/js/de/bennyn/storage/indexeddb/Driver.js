@@ -3,10 +3,11 @@ window.de.bennyn = window.de.bennyn || {};
 window.de.bennyn.storage = window.de.bennyn.storage || {};
 window.de.bennyn.storage.indexeddb = window.de.bennyn.storage.indexeddb || {};
 
-window.de.bennyn.storage.indexeddb.Driver = function (database) {
+window.de.bennyn.storage.indexeddb.Driver = function (database, name) {
   this.iDBDatabase = database;
-  // IDBFactory
-  this.api = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB;
+  this.database = {
+    name: name
+  };
 };
 
 window.de.bennyn.storage.indexeddb.Driver.prototype.get = function (collection, key, successCallback, errorCallback) {
@@ -75,17 +76,21 @@ window.de.bennyn.storage.indexeddb.Driver.prototype.deleteCollection = function 
   };
 };
 
-window.de.bennyn.storage.indexeddb.Driver.prototype.delete = function (name) {
+window.de.bennyn.storage.indexeddb.Driver.prototype.deleteDatabase = function (successCallback, errorCallback) {
   this.iDBDatabase.close();
 
-  var request = this.api.deleteDatabase(name);
+  var request = window.indexedDB.deleteDatabase(this.database.name);
 
   request.onsuccess = function (event) {
-    successCallback(event.target.result);
+    if (typeof successCallback === 'function') {
+      successCallback(event.target.result);
+    }
   };
 
   request.onerror = function (event) {
-    errorCallback(event.target.result);
+    if (typeof successCallback === 'errorCallback') {
+      errorCallback(event.target.result);
+    }
   };
 };
 
@@ -101,15 +106,14 @@ window.de.bennyn.storage.indexeddb.Driver.prototype.delete = function (name) {
  */
 window.de.bennyn.storage.indexeddb.Driver.create = function (schema, createSuccess, createFailed) {
   try {
-
     // IDBOpenDBRequest
-    var request = this.api.open(schema.name, schema.version);
+    var request = window.indexedDB.open(schema.name, schema.version);
   } catch (error) {
     createFailed(error);
   }
 
   request.onsuccess = function (event) {
-    createSuccess(new window.de.bennyn.storage.indexeddb.Driver(request.result));
+    createSuccess(new window.de.bennyn.storage.indexeddb.Driver(request.result, schema.name));
   };
 
   request.onerror = request.onblocked = function (event) {
