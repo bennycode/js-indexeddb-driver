@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Demo</title>
+    <meta charset="UTF-8" />
+    <script src="../src/main/js/ydn.db-i-crud.js"></script>
+  </head>
+  <body>
+    <script>
+      var schema = {
+        stores: [{
+            name: 'customer', // required. object store name or TABLE name
+            keyPath: 'email', // keyPath.
+            autoIncrement: true, // if true, key will be automatically created
+          }, {
+            name: 'product',
+            keyPath: 'id.sku',
+            indexes: [{
+                keyPath: 'origin', // required.
+                name: 'name', // usually omitted. generally same as keyPath.
+                unique: true, // unique constrain
+                multiEntry: true   //
+              }]
+          }]
+      };
+
+      var options = {
+        mechanisms: ['indexeddb']
+      };
+
+      var name = 'db-name';
+      var db = new ydn.db.Storage(name, schema, options);
+    </script>
+  </body>
+</html>

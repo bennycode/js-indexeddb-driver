@@ -1,0 +1,14 @@
+{
+  "name": "js-indexeddb-driver",
+  "description": "",
+  "main": "dist/js-indexeddb-driver.js",
+  "keywords": [],
+  "dependencies": {},
+  "devDependencies": {
+    "ydn.db": "git://github.com/yathit/ydn-db.git#1.3.3"
+  },
+  "ignore": [
+    "*",
+    "!dist/*"
+  ]
+}
