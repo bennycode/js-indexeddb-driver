@@ -4,14 +4,39 @@
     <title>Demo</title>
     <meta charset="UTF-8" />
     <script src="../src/main/js/ydn.db-i-crud.js"></script>
+    <script src="../src/main/js/de/bennyn/storage/indexeddb/Driver.js"></script>
   </head>
   <body>
+    <script>
+      var driver = de.bennyn.storage.indexeddb.Driver;
+      var databaseName = 'bennys-db';
+      var configuration = {};
+      var onSuccess = function (driver) {
+
+      };
+      var onError = function (error) {
+        alert('Error accessing IndexedDB storage');
+      };
+
+      var schema = {
+        name: 'bennys-db-2',
+        version: 1,
+        objectStores: {
+          brands: {
+            keyPath: 'id',
+            autoIncrement: true
+          }
+        }
+      };
+
+      driver.create(schema, onSuccess, onError);
+    </script>
     <script>
       var schema = {
         stores: [{
             name: 'customer', // required. object store name or TABLE name
             keyPath: 'email', // keyPath.
-            autoIncrement: true, // if true, key will be automatically created
+            autoIncrement: true // if true, key will be automatically created
           }, {
             name: 'product',
             keyPath: 'id.sku',
