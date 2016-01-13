@@ -11,9 +11,16 @@
       var driver = de.bennyn.storage.indexeddb.Driver;
       var databaseName = 'bennys-db';
       var configuration = {};
-      var onSuccess = function (driver) {
 
+      /***
+       * 
+       * @param {de.bennyn.storage.indexeddb.Driver} driver
+       * @returns {undefined}
+       */
+      var onSuccess = function (driver) {
+        driver.delete(databaseName);
       };
+
       var onError = function (error) {
         alert('Error accessing IndexedDB storage');
       };

@@ -3,8 +3,10 @@ window.de.bennyn = window.de.bennyn || {};
 window.de.bennyn.storage = window.de.bennyn.storage || {};
 window.de.bennyn.storage.indexeddb = window.de.bennyn.storage.indexeddb || {};
 
-window.de.bennyn.storage.indexeddb.Driver = function () {
-  this.iDBDatabase = undefined;
+window.de.bennyn.storage.indexeddb.Driver = function (database) {
+  this.iDBDatabase = database;
+  // IDBFactory
+  this.api = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB;
 };
 
 window.de.bennyn.storage.indexeddb.Driver.prototype.get = function (collection, key, successCallback, errorCallback) {
@@ -58,7 +60,7 @@ window.de.bennyn.storage.indexeddb.Driver.prototype.put = function (collection, 
   };
 };
 
-window.de.bennyn.storage.indexeddb.Driver.prototype.delete = function (collection, key, successCallback, errorCallback) {
+window.de.bennyn.storage.indexeddb.Driver.prototype.deleteCollection = function (collection, key, successCallback, errorCallback) {
   var transaction = this.iDBDatabase.transaction(collection, 'readwrite');
   var objectStore = transaction.objectStore(collection);
 
@@ -73,10 +75,35 @@ window.de.bennyn.storage.indexeddb.Driver.prototype.delete = function (collectio
   };
 };
 
+window.de.bennyn.storage.indexeddb.Driver.prototype.delete = function (name) {
+  this.iDBDatabase.close();
+
+  var request = this.api.deleteDatabase(name);
+
+  request.onsuccess = function (event) {
+    successCallback(event.target.result);
+  };
+
+  request.onerror = function (event) {
+    errorCallback(event.target.result);
+  };
+};
+
+/**
+ * 
+ * @param {object} schema Database comfiguration including object store configuration
+ * @param {number} schema.version Version of database schema
+ * @param {object} schema.objectStores Object store configuration
+ * @param {string} schema.name Database name
+ * @param {function} createSuccess Success callback function
+ * @param {function} createFailed Error callback function
+ * @returns {undefined}
+ */
 window.de.bennyn.storage.indexeddb.Driver.create = function (schema, createSuccess, createFailed) {
   try {
-    var indexedDB = window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB;
-    var request = indexedDB.open(schema.name, schema.version);
+
+    // IDBOpenDBRequest
+    var request = this.api.open(schema.name, schema.version);
   } catch (error) {
     createFailed(error);
   }
@@ -85,14 +112,17 @@ window.de.bennyn.storage.indexeddb.Driver.create = function (schema, createSucce
     createSuccess(new window.de.bennyn.storage.indexeddb.Driver(request.result));
   };
 
-  request.onerror = function (event) {
+  request.onerror = request.onblocked = function (event) {
     createFailed(event.target);
   };
 
   request.onupgradeneeded = function (event) {
+    var database = event.target.result;
     for (var name in schema.objectStores) {
-      var optionalParameters = schema.objectStores[name];
-      request.result.createObjectStore(name, optionalParameters);
+      if (!database.objectStoreNames.contains(name)) {
+        var optionalParameters = schema.objectStores[name];
+        request.result.createObjectStore(name, optionalParameters);
+      }
     }
   };
 };
