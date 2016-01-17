@@ -95,11 +95,7 @@ window.de.bennyn.storage.indexeddb.Driver.prototype.deleteDatabase = function (s
 };
 
 /**
- * 
- * @param {object} schema Database comfiguration including object store configuration
- * @param {number} schema.version Version of database schema
- * @param {object} schema.objectStores Object store configuration
- * @param {string} schema.name Database name
+ * @param {{version: number, objectStores: object, name: string}} schema Database configuration
  * @param {function} createSuccess Success callback function
  * @param {function} createFailed Error callback function
  * @returns {undefined}
