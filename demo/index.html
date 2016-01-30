@@ -3,10 +3,11 @@
   <head>
     <title>Demo</title>
     <meta charset="UTF-8" />
-    <script src="../src/main/js/ydn.db-i-crud.js"></script>
+    <script src="../bower_components/ydn.db/dist/ydn.db-i-core-qry.js"></script>
     <script src="../src/main/js/de/bennyn/storage/indexeddb/Driver.js"></script>
   </head>
   <body>
+    <!--
     <script>
       var driver = de.bennyn.storage.indexeddb.Driver;
       var configuration = {};
@@ -37,30 +38,67 @@
 
       driver.create(schema, onSuccess, onError);
     </script>
+    !-->
     <script>
+      var conversation = {
+        name: 'conversation',
+        autoIncrement: false,
+        indexes: [
+          {
+            name: 'conversation',
+            keyPath: 'conversation'
+          },
+          {
+            name: 'time',
+            keyPath: 'time'
+          },
+          {
+            name: 'conversation, time',
+            keyPath: ['conversation', 'time']
+          }
+        ]
+      };
+
       var schema = {
-        stores: [{
-            name: 'customer', // required. object store name or TABLE name
-            keyPath: 'email', // keyPath.
-            autoIncrement: true // if true, key will be automatically created
-          }, {
-            name: 'product',
-            keyPath: 'id.sku',
-            indexes: [{
-                keyPath: 'origin', // required.
-                name: 'name', // usually omitted. generally same as keyPath.
-                unique: true, // unique constrain
-                multiEntry: true   //
-              }]
-          }]
+        stores: [
+          conversation
+        ]
       };
 
-      var options = {
-        mechanisms: ['indexeddb']
-      };
+      var db = new ydn.db.Storage('my-db', schema, {mechanisms: ['indexeddb']});
 
-      var name = 'db-name';
-      var db = new ydn.db.Storage(name, schema, options);
+      var values = [
+        {"data": {"data": "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABsSFBcUERsXFhceHBsgKEIrKCUlKFE6PTBCYFVlZF9VXVtqeJmBanGQc1tdhbWGkJ6jq62rZ4C8ybqmx5moq6T/2wBDARweHigjKE4rK06kbl1upKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKT/wAARCABWADEDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDRqvcXKxHavLfyqWaTy4mf0HFYssvU5yaQFiS7Y/ekP0zRFdOD8rn6ZrMRt75Y1KrBXODwKXNrYvl0ub1tdiQ7X4bsfWrBFYcUyscA81sWsnmRc9RwaZIuwUVJiigDP1JiLbj1rFTBGWOSa3rqPzYGWsAxNHkYzilJMqDXUjKtHJlPmB7UqSFpTuHTtQpIYk5FSLCkgMjMcnpiofmapdiSI/vE6ZzW5YfeI7EVh2sYaUKCSfeuhs02c+1XHYym9Sztop2aKZJTNUrm23MWUfhV2opAT0pkmW9oW7VEIpIjt2Ej2rWSQg/Myn8M0/eh52DPuKTVylJop6bat5pkZcD3rXXgcVAjE9+Pap1oC99R+aKSikBAayr2+HKoflH61c1GUxWjkdTxWNBD5vLHOaJS5RwjzEaXMsnzFuPQVZhu2Q8nPtVSRBbzlACQRniprRRJISfyqOa2ppyJ6GnbXYdhxg1qRfMARWJFEEmXaeSa2rX7h+tVGXMrmco8rsTYopaKoky9Sj3wY96yUWSEHoa2bUi4sIjycoOT6ioHtSTwKGrjjJozI97ku3LGlSMhyw61dNk+cgVYgsyBl6zUNTR1NCKziJbJHPrV8XUEAKs43Dqo5IqvczRWFuXONx+6vqa50TyGYy5+Zjk+9aJWVjJu7udP/akP9yT8h/jRXP8A21v7g/OiiwCxancQWwhj2gDOCRzSW+rXMUh8xvNUnkN/SiiqEaUeuW5XLRSA+gwf61DPr/UQw4Pq5/pRRQBjy3EtxKXlYsx9e1KKKKAFooopAf/Z", "content_type": "image/jpeg", "id": "01c86ab7-4d38-4a4e-8e7e-e6d73a3c2b94", "content_length": 1218, "info": {"original_width": 1094, "public": true, "width": 49, "correlation_id": "48aa1bd4-fbb1-4cdc-bbbc-7160dc4d032e", "original_height": 1919, "tag": "preview", "nonce": "48aa1bd4-fbb1-4cdc-bbbc-7160dc4d032e", "height": 86}}, "from": "532af01e-1e24-4366-aacf-33b67d4ee376", "time": "2016-12-18T11:15:00.201Z", "id": "ae9.800122000b259e4e", "type": "conversation.asset-add", "conversation": "5aeafc6d-2a2d-4105-bc87-41cc8b72774a"}
+        , {"data": {"data": "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABsSFBcUERsXFhceHBsgKEIrKCUlKFE6PTBCYFVlZF9VXVtqeJmBanGQc1tdhbWGkJ6jq62rZ4C8ybqmx5moq6T/2wBDARweHigjKE4rK06kbl1upKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKSkpKT/wAARCABWADEDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDRqvcXKxHavLfyqWaTy4mf0HFYssvU5yaQFiS7Y/ekP0zRFdOD8rn6ZrMRt75Y1KrBXODwKXNrYvl0ub1tdiQ7X4bsfWrBFYcUyscA81sWsnmRc9RwaZIuwUVJiigDP1JiLbj1rFTBGWOSa3rqPzYGWsAxNHkYzilJMqDXUjKtHJlPmB7UqSFpTuHTtQpIYk5FSLCkgMjMcnpiofmapdiSI/vE6ZzW5YfeI7EVh2sYaUKCSfeuhs02c+1XHYym9Sztop2aKZJTNUrm23MWUfhV2opAT0pkmW9oW7VEIpIjt2Ej2rWSQg/Myn8M0/eh52DPuKTVylJop6bat5pkZcD3rXXgcVAjE9+Pap1oC99R+aKSikBAayr2+HKoflH61c1GUxWjkdTxWNBD5vLHOaJS5RwjzEaXMsnzFuPQVZhu2Q8nPtVSRBbzlACQRniprRRJISfyqOa2ppyJ6GnbXYdhxg1qRfMARWJFEEmXaeSa2rX7h+tVGXMrmco8rsTYopaKoky9Sj3wY96yUWSEHoa2bUi4sIjycoOT6ioHtSTwKGrjjJozI97ku3LGlSMhyw61dNk+cgVYgsyBl6zUNTR1NCKziJbJHPrV8XUEAKs43Dqo5IqvczRWFuXONx+6vqa50TyGYy5+Zjk+9aJWVjJu7udP/akP9yT8h/jRXP8A21v7g/OiiwCxancQWwhj2gDOCRzSW+rXMUh8xvNUnkN/SiiqEaUeuW5XLRSA+gwf61DPr/UQw4Pq5/pRRQBjy3EtxKXlYsx9e1KKKKAFooopAf/Z", "content_type": "image/jpeg", "id": "01c86ab7-4d38-4a4e-8e7e-e6d73a3c2b94", "content_length": 1218, "info": {"original_width": 1094, "public": true, "width": 49, "correlation_id": "48aa1bd4-fbb1-4cdc-bbbc-7160dc4d032e", "original_height": 1919, "tag": "preview", "nonce": "48aa1bd4-fbb1-4cdc-bbbc-7160dc4d032e", "height": 86}}, "from": "532af01e-1e24-4366-aacf-33b67d4ee376", "time": "2015-12-18T11:15:00.201Z", "id": "ae8.800122000b259e4e", "type": "conversation.asset-add", "conversation": "5aeafc6d-2a2d-4105-bc87-41cc8b72774a"}
+        , {"data": {"creator": "7af94151-652b-4c13-8336-ba6be8f9938c", "access": ["invite"], "last_event_time": "2015-12-21T09:49:07.973Z", "members": {"self": {"last_read": "1.800122000b26a107", "archived": null, "status_time": "2015-12-21T09:49:07.973Z", "status_ref": "0.0", "id": "532af01e-1e24-4366-aacf-33b67d4ee376", "muted": null, "cleared": null, "muted_time": null, "status": 0}, "others": [{"id": "7af94151-652b-4c13-8336-ba6be8f9938c", "status": 0}, {"id": "7442a7df-8cd8-493f-aa7c-4939a2683d02", "status": 0}]}, "last_event": "1.800122000b26a107", "name": null, "id": "6cd0c0ed-d07f-440f-90ed-276ea17519aa", "type": 0}, "from": "7af94151-652b-4c13-8336-ba6be8f9938c", "time": "2015-12-21T09:49:07.989Z", "type": "conversation.create", "conversation": "6cd0c0ed-d07f-440f-90ed-276ea17519aa"}
+        , {"data": {"ref": "a8d.800122000a568cfd", "nonce": "ae362a3c-fa06-4430-ad6e-29dde16e7260"}, "from": "d794bf14-96a0-43e9-be95-ae761d1acb4e", "time": "2016-01-12T09:00:32.736Z", "id": "a8e.800122000a568cfe", "type": "conversation.hot-knock", "conversation": "872eaa34-9673-44af-abaa-e1b6979a7cff"}
+        , {"data": {"nonce": "33a16765-2b23-42a1-b1cc-414d1baa9095"}, "from": "d794bf14-96a0-43e9-be95-ae761d1acb4e", "time": "2015-12-21T10:14:59.661Z", "id": "a2b.800122000ad94450", "type": "conversation.knock", "conversation": "872eaa34-9673-44af-abaa-e1b6979a7cff"}
+        , {"data": {"user_ids": ["4c339ead-e6b7-4534-ad01-4c0276a71cd1"]}, "from": "65040647-cf54-4450-90e6-dc2307101b89", "time": "2015-12-18T11:16:56.240Z", "id": "12.800122000ad83a8f", "type": "conversation.member-join", "conversation": "bd8274d7-02c7-43a3-a86e-7ac53a5f104c"}
+        , {"data": {"user_ids": ["2aa0b9ed-8fce-448e-ad7f-f0341a31aaf1"]}, "from": "2aa0b9ed-8fce-448e-ad7f-f0341a31aaf1", "time": "2015-12-21T09:55:17.201Z", "id": "33b.800122000b26a167", "type": "conversation.member-leave", "conversation": "c440e6ab-aa65-498f-9c8b-26b6a633f2e4"}
+        , {"data": {"last_read": "ae6.800122000ad83952"}, "from": "532af01e-1e24-4366-aacf-33b67d4ee376", "time": "2015-12-18T11:14:50.426Z", "type": "conversation.member-update", "conversation": "5aeafc6d-2a2d-4105-bc87-41cc8b72774a"}
+        , {"data": {"nonce": "dee6065c-0444-4ae6-860d-77883ca79627", "content": "ðŸ\u2018?ðŸ?¼"}, "from": "228d931a-3929-4f50-bb2b-e40aa7195969", "time": "2015-12-18T11:13:17.136Z", "id": "1743.800122000ad83a3d", "type": "conversation.message-add", "conversation": "d563bd2f-7416-4a94-b34f-760ff79e1419"}
+      ];
+
+      for (var i = 0; i < values.length; i++) {
+        var value = values[i];
+        if (value.id) {
+          db.put('conversation', value, value.id);
+        } else {
+          console.warn(value.type);
+        }
+        // 
+      }
+
+      var query = db
+              .from('conversation')
+              .order('time')
+              .reverse()
+              .list(1)
+              .done(function (events) {
+                events.forEach(function (event) {
+                  console.log(event.time);
+                });
+              });
     </script>
   </body>
 </html>
